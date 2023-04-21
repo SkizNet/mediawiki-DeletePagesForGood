@@ -12,24 +12,19 @@
 	"license-name": "GPL-2.0-or-later",
 	"type": "other",
 	"requires": {
-		"MediaWiki": ">= 1.34.0"
-	},
-	"GroupPermissions": {
-		"*": {
-			"deleteperm": false
-		},
-		"user": {
-			"deleteperm": false
-		},
-		"bureaucrat": {
-			"deleteperm": false
-		},
-		"sysop": {
-			"deleteperm": true
-		}
+		"MediaWiki": ">= 1.39.0"
 	},
 	"Actions": {
-		"delete_page_permanently": "ActionDeletePagePermanently"
+		"deleteperm": {
+			"class": "MediaWiki\\Extension\\DeletePagesForGood\\ActionDeletePermanently",
+			"services": [
+				"DeletePagesForGood",
+				"DeletePageFactory",
+				"DBLoadBalancer",
+				"JobQueueGroupFactory",
+				"RepoGroup"
+			]
+		}
 	},
 	"AvailableRights": [
 		"deleteperm"
@@ -39,32 +34,28 @@
 			"i18n"
 		]
 	},
-	"Hooks": {
-		"SkinTemplateNavigation::Universal": "ActionDeletePagePermanently::onAddSkinHook"
+	"AutoloadNamespaces": {
+		"MediaWiki\\Extension\\DeletePagesForGood\\": "src/"
 	},
-	"AutoloadClasses": {
-		"ActionDeletePagePermanently": "ActionDeletePagePermanently.php"
-	},
-	"config": {
-		"DeletePagesForGoodNamespaces": {
-			"0": true,
-			"1": true,
-			"2": true,
-			"3": true,
-			"4": true,
-			"5": true,
-			"6": true,
-			"7": true,
-			"8": true,
-			"9": true,
-			"10": true,
-			"11": true,
-			"12": true,
-			"13": true,
-			"14": true,
-			"15": true,
-			"_merge_strategy": "array_plus"
+	"HookHandlers": {
+		"main": {
+			"class": "MediaWiki\\Extension\\DeletePagesForGood\\Hooks",
+			"services": [
+				"DeletePagesForGood",
+				"PermissionManager"
+			]
 		}
 	},
-	"manifest_version": 1
+	"Hooks": {
+		"SkinTemplateNavigation::Universal": "main"
+	},
+	"JobClasses": {
+		"DeletePermanentlyJob": {
+			"class": "MediaWiki\\Extension\\DeletePagesForGood\\DeletePermanentlyJob"
+		}
+	},
+	"ServiceWiringFiles": [
+		"src/ServiceWiring.php"
+	],
+	"manifest_version": 2
 }
